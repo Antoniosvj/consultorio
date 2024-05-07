@@ -21,7 +21,7 @@ class Funcs():
     def montar_tabela(self):
         self.conecta_bd()
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS cadastro_clientes (
-                    id INTEGER NOT NULL PRIMARY KEY,
+                    cod INTEGER NOT NULL PRIMARY KEY,
                     nome VARCHAR(100) NOT NULL,
                     telefone INTEGER(20),
                     cpf INTEGER(12));
@@ -29,12 +29,13 @@ class Funcs():
         self.conn.commit()
         print('Banco de dados criado.')
         self.desconecta_bd()
-    def add_cliente(self):
+    def variaveis(self):
         self.cod = self.entry_cod.get()
         self.nome = self.entry_nome.get()
         self.telefone = self.entry_telefone.get()
         self.cpf = self.entry_cpf.get()
-
+    def add_cliente(self):
+        self.variaveis()
         self.conecta_bd()
         self.cursor.execute('''INSERT INTO cadastro_clientes (nome, telefone, cpf) VALUES (?, ?, ?)''', (self.nome, self.telefone, self.cpf))
         self.conn.commit()
@@ -45,10 +46,28 @@ class Funcs():
     def select_lista(self):
         self.listaCli.delete(*self.listaCli.get_children())
         self.conecta_bd()
-        lista = self.cursor.execute('''SELECT id, nome, telefone, cpf from cadastro_clientes ORDER BY nome ASC''')
+        lista = self.cursor.execute('''SELECT cod, nome, telefone, cpf from cadastro_clientes ORDER BY nome ASC''')
         for i in lista:
             self.listaCli.insert('', END, values=i)
         self.desconecta_bd()
+    def click_duplo(self, event):
+        self.limpar_tela()
+        self.listaCli.selection()
+
+        for n in self.listaCli.selection():
+            col1, col2, col3, col4 = self.listaCli.item(n, 'values')
+            self.entry_cod.insert(END, col1)
+            self.entry_nome.insert(END, col2)
+            self.entry_telefone.insert(END, col3)
+            self.entry_cpf.insert(END, col4)
+    def deleta_cliente(self):
+        self.variaveis()
+        self.conecta_bd()
+        self.cursor.execute('''DELETE FROM cadastro_clientes WHERE cod = ?''', (self.cod))
+        self.conn.commit()
+        self.desconecta_bd()
+        self.limpar_tela()
+        self.select_lista()
 
 class Aplication(Funcs):
     def __init__(self):
@@ -88,7 +107,7 @@ class Aplication(Funcs):
         self.btn_salvar.place(relx=0.4, rely=0.1, relwidth=0.2, relheight=0.13)
 
         # Botão excluir Cadastro
-        self.btn_excluir = Button(self.frame_cadastro, text='Excluir', bg='#fa7070', bd=2, activebackground='#fa7171', foreground="#fff", font='Helvetica')
+        self.btn_excluir = Button(self.frame_cadastro, text='Excluir', bg='#fa7070', bd=2, activebackground='#fa7171', foreground="#fff", font='Helvetica', command=self.deleta_cliente)
         self.btn_excluir.place(relx=0.65, rely=0.1, relwidth=0.1, relheight=0.13)
 
         #Botão Livro Caixa
@@ -141,5 +160,7 @@ class Aplication(Funcs):
         self.scrollLista = Scrollbar(self.frame_lista, orient='vertical')
         self.listaCli.configure(yscroll=self.scrollLista.set)
         self.scrollLista.place(relx=0.96, rely=0.01, relwidth=0.03, relheight=0.95)
+
+        self.listaCli.bind('<Double-1>', self.click_duplo)
 
 Aplication()
