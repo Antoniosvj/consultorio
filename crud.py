@@ -52,18 +52,18 @@ class AppBD:
         finally:
             self.fecharConexao()
     
-    def carregarPaciente(self):
+    def carregarPacientes(self):
+        pacientes = []
         try:
             self.abrirConexao()
             comando = '''SELECT * FROM pacientes'''
             self.cursor.execute(comando)
             pacientes = self.cursor.fetchall()
-            for paciente in pacientes:
-                print(paciente)
-        except(Exception, conector.error) as error:
+        except (Exception, conector.Error) as error:
             print('Erro ao conectar ao banco de dados', error)
         finally:
             self.fecharConexao()
+            return pacientes
             
     def atualizarPaciente(self, id, nome, dataNascimento, telefone, cpf, responsavel):
         try:
@@ -78,7 +78,7 @@ class AppBD:
             self.cursor.execute(comando, (nome, dataNascimento, telefone, cpf, responsavel, id))
             self.conn.commit()
             print('Atualização realizada com sucesso.')
-        except(Exception, conector.error) as error:
+        except (Exception, conector.Error) as error:
             print('Erro ao conectar ao banco de dados')
         finally:
             self.fecharConexao()
@@ -90,8 +90,7 @@ class AppBD:
             self.cursor.execute(comando, (id,))
             self.conn.commit()
             print('paciente deletado')
-        except(Exception, conector.error) as error:
+        except (Exception, conector.Error) as error:
             print('Erro ao conectar ao banco de dados')
         finally:
             self.fecharConexao()
-   

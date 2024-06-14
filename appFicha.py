@@ -73,5 +73,3 @@ def fichaPaciente():
     root = tk.Tk()
     app = FichaPaciente(root)
     root.mainloop()
-
-fichaPaciente()
