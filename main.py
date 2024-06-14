@@ -7,9 +7,25 @@ class ConsultorioApp:
     def __init__(self, root):
         self.root = root
         self.root.title('Consultório Odontológico')
-        self.root.geometry('1050x680')
-        
+        self.root.geometry('1200x680')
         self.setup_widgets()
+        #self.AppBD()
+        #self.AppBD.criarTabela()
+        
+    def f_adicionar(self):
+        pass
+    
+    def f_abrir(self):
+        print('abriu')
+    
+    def f_editar(self):
+        print('editado')
+    
+    def f_excluir(self):
+        print('excluido')
+    
+    def f_caixa(self):
+        print('caixa')
     
     def setup_widgets(self):
         #adição das labels
@@ -40,25 +56,47 @@ class ConsultorioApp:
         self.txtCpf.place(x=700, y=100, width=150, height=25)
         
         #criar e adicionar botões na tela
-        self.btnAdicionar = ttk.Button(self.root, text='Adicionar')
+        self.btnAdicionar = ttk.Button(self.root, text='Adicionar', command=self.f_adicionar)
         self.btnAdicionar.place(x=50, y=150, width=100, height=25)
         
-        self.btnAbrir = ttk.Button(self.root, text='Abrir Ficha')
-        self.btnAbrir.place(x=250, y=150, width=100, height=25)
+        self.btnAbrir = ttk.Button(self.root, text='Abrir Ficha', command=self.f_abrir)
+        self.btnAbrir.place(x=300, y=150, width=100, height=25)
         
-        self.btnEditar = ttk.Button(self.root, text='Editar Cadastro')
-        self.btnEditar.place(x=450, y=150, width=100, height=25)
+        self.btnEditar = ttk.Button(self.root, text='Editar Cadastro', command=self.f_editar)
+        self.btnEditar.place(x=550, y=150, width=100, height=25)
         
-        self.btnExcluir = ttk.Button(self.root, text='Excluir Cadastro')
-        self.btnExcluir.place(x=650, y=150, width=100, height=25)
+        self.btnExcluir = ttk.Button(self.root, text='Excluir Cadastro', command=self.f_excluir)
+        self.btnExcluir.place(x=800, y=150, width=100, height=25)
         
-        self.btnCaixa = ttk.Button(self.root, text='Livro Caixa')
-        self.btnCaixa.place(x=850, y=150, width=100, height=25)
+        self.btnCaixa = ttk.Button(self.root, text='Livro Caixa', command=self.f_caixa)
+        self.btnCaixa.place(x=1050, y=150, width=100, height=25)
+        
+        #tabela dos pacientes
+        self.tree = ttk.Treeview(self.root, columns=('id', 'nome', 'dataNascimento', 'telefone', 'cpf', 'responsavel'),
+                                 show='headings')
+        
+        #cabeçalho da coluna
+        self.tree.heading('id', text='ID')
+        self.tree.heading('nome', text='Nome')
+        self.tree.heading('dataNascimento', text='Data de Nascimento')
+        self.tree.heading('telefone', text='Telefone')
+        self.tree.heading('cpf', text='CPF')
+        self.tree.heading('responsavel', text='Responsável')
+        
+        #largura da coluna
+        self.tree.column('id', width=30)
+        self.tree.column('nome', width=400)
+        self.tree.column('dataNascimento', width=150)
+        self.tree.column('telefone', width=150)
+        self.tree.column('cpf', width=150)
+        self.tree.column('responsavel', width=250)
+        
+        #localização da tabela
+        self.tree.place(x=10, y=200, width=1160, height=450)
 
 def main():
     root = tk.Tk()
     app = ConsultorioApp(root)
-    
     root.mainloop()
     
 if __name__=='__main__':
