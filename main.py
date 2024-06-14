@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 #from crud import AppBD
-
+from appcaixa import livroCaixa
+from appFicha import fichaPaciente
 
 class ConsultorioApp:
     def __init__(self, root):
@@ -16,7 +17,7 @@ class ConsultorioApp:
         pass
     
     def f_abrir(self):
-        print('abriu')
+        fichaPaciente()
     
     def f_editar(self):
         print('editado')
@@ -25,17 +26,17 @@ class ConsultorioApp:
         print('excluido')
     
     def f_caixa(self):
-        print('caixa')
+        livroCaixa()
     
     def setup_widgets(self):
-        #adição das labels
+        # labels
         self.lblId = tk.Label(self.root, text='Id:', font=14)
         self.lblNome = tk.Label(self.root, text='Nome:', font=14)
         self.lblDataNascimento = tk.Label(self.root, text='Data de Nascimento:', font=14)
         self.lblTelefone = tk.Label(self.root, text='Telefone:', font=14)
         self.lblCpf = tk.Label(self.root, text='Cpf:', font=14)
         
-        #adição das entry
+        # entry
         self.txtId = ttk.Entry(font=14)
         self.txtNome = ttk.Entry(font=14)
         self.txtTelefone = ttk.Entry(font=14)
