@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from crud import AppBD
 from appcaixa import livroCaixa
 from appFicha import fichaPaciente
@@ -9,15 +9,17 @@ class ConsultorioApp:
         self.root = root
         self.root.title('Consultório Odontológico')
         self.root.geometry('1200x680')
+        self.pacientes=[]
         self.AppBD = AppBD()
         self.setup_widgets()
         self.carregar_dados()
         
     def carregar_dados(self):
         try:
-            pacientes = self.AppBD.carregarPacientes()  
+            self.pacientes = self.AppBD.carregarPacientes()  
+            self.pacientes_ordenados = sorted(self.pacientes, key=lambda x: x[1].lower())
         
-            for paciente in pacientes:
+            for paciente in self.pacientes_ordenados:
                 self.tree.insert('', 'end', values=(
                     paciente[0],
                     paciente[1],
@@ -28,6 +30,21 @@ class ConsultorioApp:
                 ))
         except Exception as e:
             print('Erro ao carregar dados: ', e)
+            
+    def procurar(self, event=None):
+        filtro = self.txtNome.get().lower()
+        self.tree.delete(*self.tree.get_children())
+        
+        for paciente in self.pacientes:
+            if filtro in paciente[1].lower():
+                self.tree.insert('', 'end', values=(
+                    paciente[0],
+                    paciente[1],
+                    paciente[2],
+                    paciente[3],
+                    paciente[4],
+                    paciente[5]
+                    ))
 
     def limpar_campos(self):
         self.txtId.delete(0, tk.END)
@@ -38,7 +55,25 @@ class ConsultorioApp:
         self.txtResponsavel.delete(0, tk.END)
     
     def f_adicionar(self):
-        self.limpar_campos()
+        self.procurar()
+        nome = self.txtNome.get()
+        dataNascimento = self.txtDataNascimento.get()
+        telefone = self.txtTelefone.get()
+        cpf = self.txtCpf.get()
+        responsavel = self.txtResponsavel.get()
+        
+        if nome and telefone:
+            try:
+                self.AppBD.adicionarPaciente(nome, dataNascimento, telefone, cpf, responsavel)
+                self.carregar_dados()
+                messagebox.showinfo('Adicionar','Paciente adicionado com sucesso!')
+            except Exception as e:
+                messagebox.ERROR('Erro','Erro ao adicionar paciente', e)
+            finally:
+                self.limpar_campos()
+        else:
+            messagebox.showwarning('Erro','Os campos nome e telefone são obrigatórios.')
+        
         
     def f_abrir(self):
         fichaPaciente()
@@ -78,22 +113,23 @@ class ConsultorioApp:
         self.lblNome.place(x=200, y= 50)
         self.txtNome = ttk.Entry(font=14)
         self.txtNome.place(x=260, y=50, width=400, height=25)
+        self.txtNome.bind('<KeyRelease>', self.procurar)
         
         self.lblResponsavel = tk.Label(self.root, text='Responsável:', font=14)
         self.lblResponsavel.place(x=700, y=50)
         self.txtResponsavel = tk.Entry(self.root, font=14)
         self.txtResponsavel.place(x=820, y=50, width=300, height=25)
         
-        self.lblDataNascimento = tk.Label(self.root, text='Data de Nascimento:', font=14)
-        self.lblDataNascimento.place(x=300, y=100)
-        self.txtDataNascimento = ttk.Entry(font=14)
-        self.txtDataNascimento.place(x=470, y=100, width=150, height=25)
-        
         self.lblTelefone = tk.Label(self.root, text='Telefone:', font=14)
         self.lblTelefone.place(x=50, y=100)
         self.txtTelefone = ttk.Entry(font=14)
         self.txtTelefone.place(x=130, y=100, width=150, height=25)
         
+        self.lblDataNascimento = tk.Label(self.root, text='Data de Nascimento:', font=14)
+        self.lblDataNascimento.place(x=300, y=100)
+        self.txtDataNascimento = ttk.Entry(font=14)
+        self.txtDataNascimento.place(x=470, y=100, width=150, height=25)
+                
         self.lblCpf = tk.Label(self.root, text='Cpf:', font=14)
         self.lblCpf.place(x=650, y=100)      
         self.txtCpf = ttk.Entry(font=14)
