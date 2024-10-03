@@ -35,6 +35,7 @@ class AppBD:
             print('Tabela pacientes criada com sucesso')
             comando2 = '''CREATE TABLE IF NOT EXISTS tratamento (
                 id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                data DATE,
                 dente INTEGER NOT NULL,
                 procedimento TEXT NOT NULL,
                 valor FLOAT NOT NULL,
@@ -108,12 +109,12 @@ class AppBD:
         finally:
             self.fecharConexao()
             
-    def adicionarTratamento(self, dente, procedimento, valor, observacao, id_paciente):
+    def adicionarTratamento(self,data, dente, procedimento, valor, observacao, id_paciente):
         try:
             self.abrirConexao()
-            comando = '''INSERT INTO tratamento (dente, procedimento, valor, observacao, id_paciente)
-                         VALUES (?, ?, ?, ?, ?);'''
-            self.cursor.execute(comando, (dente, procedimento, valor, observacao, id_paciente))
+            comando = '''INSERT INTO tratamento (data, dente, procedimento, valor, observacao, id_paciente)
+                         VALUES (?, ?, ?, ?, ?, ?);'''
+            self.cursor.execute(comando, (data, dente, procedimento, valor, observacao, id_paciente))
             self.conn.commit()
             print('Tratamento adicionado com sucesso')
         except (Exception, conector.Error) as error:

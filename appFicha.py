@@ -18,6 +18,7 @@ class FichaPaciente:
         self.txtProcedimento.delete(0, tk.END)
         self.txtValor.delete(0, tk.END)
         self.txtObs.delete(0, tk.END)
+        self.txtData.delete(0,tk.END)
         
     def carregar_dados(self):
         try:
@@ -27,14 +28,23 @@ class FichaPaciente:
             # Limpa o Treeview antes de inserir os novos dados
             self.tree.delete(*self.tree.get_children())
             
+            #carregar total tratamento
+            total_tratamento = 0.0
+            
             # Insere os tratamentos no Treeview
             for tratamento in tratamentos:
                 self.tree.insert('', 'end', values=(
-                    tratamento[1],  # Dente
-                    tratamento[2],  # Procedimento
-                    tratamento[3],  # Valor
-                    tratamento[4]   # Observação
+                    tratamento[1],  # data
+                    tratamento[2],  # Dente
+                    tratamento[3],  # Procedimento
+                    tratamento[4],  # Valor
+                    tratamento[5]   # Observação
                 ))
+                
+                total_tratamento +=float(tratamento[4])
+            
+            #atualizar dados total
+            self.lblTotal.config(text=f'R${total_tratamento:.2f}')
         except Exception as e:
             messagebox.showerror('Erro', f'Erro ao carregar tratamentos: {e}')
 
@@ -52,15 +62,22 @@ class FichaPaciente:
         procedimento = self.txtProcedimento.get()
         valor = self.txtValor.get()
         observacao = self.txtObs.get()
+        data = self.txtData.get()
         id_paciente = self.paciente_id
         
         try:
-            self.AppBD.adicionarTratamento(dente, procedimento, valor, observacao, id_paciente)
+            self.AppBD.adicionarTratamento(data, dente, procedimento, valor, observacao, id_paciente)
             self.carregar_dados()
         except Exception as e:
             messagebox.showerror('Erro', f'Erro ao adicionar o tratamento.{e}',e)
         finally:
             self.limpar_campos()
+            
+    def f_excluir(self):
+        pass
+    
+    def f_editar(self):
+        pass
         
         
     def setup_widgets(self):
@@ -74,10 +91,13 @@ class FichaPaciente:
         self.nb.place(x=20, y=100, width=800, height=570)
 
         self.orcamento = ttk.Frame(self.nb)
-        self.nb.add(self.orcamento, text='Orçamento')
+        self.nb.add(self.orcamento, text='Orçamento / Tratamento')
 
+        self.anamnese = ttk.Frame(self.nb)
+        self.nb.add(self.anamnese, text='Anamnese')
+        
         self.tratamento = ttk.Frame(self.nb)
-        self.nb.add(self.tratamento, text='Tratamento')
+        self.nb.add(self.tratamento, text='Tratamentos Anteriores')
 
         self.lblDente = tk.Label(self.orcamento, text='Dente:', font=14)
         self.lblDente.place(x=10, y=20)
@@ -102,22 +122,36 @@ class FichaPaciente:
         
         self.txtObs = ttk.Entry(self.orcamento, font=14)
         self.txtObs.place(x=50, y=70, height=25, width=480)
+        
+        self.lblData = tk.Label(self.orcamento, text='Data', font=14)
+        self.lblData.place(x=550, y=70)
 
         self.btnAdicionar = ttk.Button(self.orcamento, text='Adicionar', command=self.f_adicionar)
-        self.btnAdicionar.place(x=570, y=70, width=200, height=25)
+        self.btnAdicionar.place(x=30, y=120, width=200, height=25)
         
-        self.tree = ttk.Treeview(self.orcamento, columns=('dente', 'procedimento', 'valor', 'obs'), show='headings')
+        self.txtData = ttk.Entry(self.orcamento, font=14)
+        self.txtData.place(x=620, y=70, width=150, height=25)
+        
+        self.btnEditar = ttk.Button(self.orcamento, text='Editar', command=self.f_editar)
+        self.btnEditar.place(x=300, y=120, width=200, height=25)
+        
+        self.btnExcluir = ttk.Button(self.orcamento, text='Exluir', command=self.f_excluir)
+        self.btnExcluir.place(x=570, y=120, width=200, height=25)
+        
+        self.tree = ttk.Treeview(self.orcamento, columns=('data', 'dente', 'procedimento', 'valor', 'obs'), show='headings')
+        self.tree.heading('data', text='DATA')
         self.tree.heading('dente', text='DENTE')
         self.tree.heading('procedimento', text='PROCEDIMENTO')
         self.tree.heading('valor', text='VALOR')
         self.tree.heading('obs', text='OBS')
     
+        self.tree.column('data', width=70)
         self.tree.column('dente', width=50)
-        self.tree.column('procedimento', width=250)
-        self.tree.column('valor', width=100)
-        self.tree.column('obs', width=300)
+        self.tree.column('procedimento', width=200)
+        self.tree.column('valor', width=50)
+        self.tree.column('obs', width=330)
 
-        self.tree.place(x=0, y=100, width=800, height=450)
+        self.tree.place(x=0, y=200, width=800, height=350)
 
         self.lblAnamnese = tk.Label (self.root, text='Anamnese:', font=14)
         self.lblAnamnese.place(x=850, y=30)
@@ -136,6 +170,8 @@ class FichaPaciente:
         
         self.lblTotalTratamento = tk.Label(self.root, text='Total Tratamento:', font=14)
         self.lblTotalTratamento.place(x=1160, y=380)
+        self.lblTotal = tk.Label(self.root, text='R$0.00', font=14)
+        self.lblTotal.place(x=1160, y=430)
         
         self.lblTratamentoRealizado = tk.Label(self.root, text='Total Realizado:', font=14)
         self.lblTratamentoRealizado.place(x=1160, y=480)
@@ -148,5 +184,4 @@ def fichaPaciente(paciente_id, paciente_nome):
     app = FichaPaciente(root, paciente_id, paciente_nome)
     root.mainloop()
 
-#if __name__ == '__main__':
- #   fichaPaciente(1, 'Antonio')
+
